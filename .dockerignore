@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.gitignore
+.opencode
+.idea
+.vscode
+*.log
+README.md
+docs
+BACKLOG.md
+AGENTS.md
+skills
+.playwright-mcp

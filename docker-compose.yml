@@ -1,0 +1,10 @@
+services:
+  ruleta:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ruleta-de-rifas:latest
+    container_name: ruleta-de-rifas
+    ports:
+      - "8125:80"
+    restart: unless-stopped

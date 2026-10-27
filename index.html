@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#070714" />
+    <meta
+      name="description"
+      content="Ruleta de rifas con sorteo animado, sonido, confeti y personalizacion completa."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070714'/%3E%3Crect x='12' y='15' width='40' height='9' rx='4.5' fill='%23ffcf3f'/%3E%3Crect x='12' y='28' width='40' height='9' rx='4.5' fill='%23e11d2e'/%3E%3Crect x='12' y='41' width='40' height='9' rx='4.5' fill='%237c3aed'/%3E%3C/svg%3E"
+    />
+    <title>Ruleta de Rifas</title>
+    <script>
+      // Apply the persisted theme before first paint to avoid a flash.
+      (function () {
+        var theme = 'dark';
+        try {
+          var raw = window.localStorage.getItem('ruleta-rifas:settings:v1');
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && parsed.theme === 'light') theme = 'light';
+          }
+        } catch (error) {
+          /* storage unavailable: keep the dark default */
+        }
+        var root = document.documentElement;
+        root.classList.toggle('dark', theme === 'dark');
+        root.style.colorScheme = theme;
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
