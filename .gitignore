@@ -12,7 +12,6 @@ yarn-error.log*
 # Artefactos de verificación con navegador
 .playwright-mcp/
 
-# Material ajeno a este proyecto (paquete de skills y guía de otro repo):
-# queda en disco pero no se publica con la ruleta.
+# Material ajeno a este proyecto: el paquete de skills queda en disco (con su
+# propio AGENTS.md) pero no se publica con la ruleta.
 skills/
-AGENTS.md
