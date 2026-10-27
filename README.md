@@ -66,3 +66,8 @@ sirven desde el propio bundle, así que no hay pedidos a Google Fonts.
 ¿Primera vez en el código? Empezá por
 [docs/arquitectura.md](docs/arquitectura.md) y después por
 [docs/desarrollo.md](docs/desarrollo.md).
+
+## Licencia
+
+MIT. Podés usar, modificar y redistribuir el código citando la autoría. Ver
+[LICENSE](LICENSE).
