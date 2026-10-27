@@ -99,17 +99,20 @@ export function inkFor(hex) {
 }
 
 export function secureRandomIndex(max) {
-  if (!Number.isFinite(max) || max <= 0) return 0;
-  const limit = Math.floor(0x100000000 / max) * max;
+  // Callers pass a list length; flooring keeps the result a real index even if
+  // one ever passes a fraction.
+  const size = Math.floor(max);
+  if (!Number.isFinite(size) || size <= 0) return 0;
+  const limit = Math.floor(0x100000000 / size) * size;
   const cryptoApi = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
-  if (!cryptoApi?.getRandomValues) return Math.floor(Math.random() * max);
+  if (!cryptoApi?.getRandomValues) return Math.floor(Math.random() * size);
   const buffer = new Uint32Array(1);
   let value = 0;
   do {
     cryptoApi.getRandomValues(buffer);
     value = buffer[0];
   } while (value >= limit);
-  return value % max;
+  return value % size;
 }
 
 const timeFormatter = new Intl.DateTimeFormat('es', {

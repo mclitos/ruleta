@@ -13,19 +13,23 @@ pestaña de control por `BroadcastChannel`. Documentación para humanos en
 | `npm run dev` | Desarrollo en `http://localhost:5173`, expuesto en la red local |
 | `npm run build` | Genera `dist/` |
 | `npm run preview` | Sirve `dist/` localmente |
+| `npm test` | Tests de lógica pura en `src/lib/*.test.js` (`node:test`, sin dependencias) |
 | `docker compose up -d --build` | Deploy en `http://localhost:8125`, contenedor `ruleta-de-rifas` |
 
-No hay script de test, lint ni CI. No inventes uno ni lo agregues sin que te lo
-pidan: la verificación es manual y está descrita abajo.
+No hay lint ni CI. Los tests cubren sólo lógica pura de `src/lib`; el resto se
+verifica a mano y está descrito abajo. No agregues dependencias de testing (ni
+Vitest, ni Testing Library) sin que te lo pidan: `node:test` alcanza y no suma
+bundle.
 
 ## Verificación
 
 Después de tocar `src/`:
 
-1. `npm run build` sin errores ni warnings nuevos.
-2. `docker compose up -d --build`, y `docker compose ps` en `healthy`.
-3. Un giro completo revela un ganador y lo registra **una sola vez**.
-4. La configuración sobrevive a recargar.
+1. `npm test` en verde (si tocaste `src/lib`).
+2. `npm run build` sin errores ni warnings nuevos.
+3. `docker compose up -d --build`, y `docker compose ps` en `healthy`.
+4. Un giro completo revela un ganador y lo registra **una sola vez**.
+5. La configuración y el historial sobreviven a recargar.
 
 Cambiar sólo `*.md` no requiere rebuild.
 

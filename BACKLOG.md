@@ -3,31 +3,16 @@
 Pendientes acordados, ordenados por riesgo real. No son urgentes: la app funciona.
 
 Hecho: historial de ganadores persistido en `localStorage`
-(`ruleta-rifas:winners:v1`, tope de 500) y repo publicado en
-https://github.com/mclitos/ruleta.
+(`ruleta-rifas:winners:v1`, tope de 500), tests de lógica pura con `node:test`
+(`npm test`) y repo publicado en https://github.com/mclitos/ruleta.
 
-## 1. Tests mínimos de lógica pura
-
-Sin dependencias, con `node:test` sobre `src/lib/*`:
-
-- `sanitizeSettings`: rangos de duración (clamp, `max >= min`), `snapSpin`, logo
-  (`logoData` inválido, tope de tamaño).
-- `randomSpinDuration(min, max)`: siempre dentro del rango, también con `min === max`
-  y con argumentos invertidos.
-- `secureRandomIndex`: valores dentro de `[0, n)` y sin sesgo evidente con `n` no
-  potencia de dos.
-- `sanitizeWinners`: descarta basura, colapsa espacios, deduplica `id` y recorta al
-  tope de 500.
-
-El bug del stream reescribiendo `localStorage` lo hubiera cazado un test de saneado.
-
-## 2. Export / Import de configuración (JSON)
+## 1. Export / Import de configuración (JSON)
 
 Todo vive en el `localStorage` de un perfil de navegador. Al cambiar de máquina, de
 perfil o al limpiar datos se pierde logo (`data:` URL), paleta, participantes y
 ajustes. Un export/import JSON evita rehacerlo a mano.
 
-## 3. Ruleta en 3D (idea, para más adelante)
+## 2. Ruleta en 3D (idea, para más adelante)
 
 Reemplazo/alternativa visual del reel vertical por una rueda que gira en perspectiva.
 

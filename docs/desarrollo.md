@@ -18,10 +18,16 @@ npm install
 npm run dev       # http://localhost:5173 (host expuesto en la red local)
 npm run build     # genera dist/
 npm run preview   # sirve dist/ localmente
+npm test          # tests de lógica pura de src/lib (node:test)
 ```
 
-No hay script de test ni de lint. La verificación es manual y está descrita abajo;
-los tests automatizados están en [BACKLOG.md](../BACKLOG.md).
+No hay lint ni CI. `npm test` corre `node --test` sobre `src/lib/*.test.js`:
+`sanitizeSettings`, `randomSpinDuration`, `secureRandomIndex`, `sanitizeWinners` y
+los helpers del stream y de color. No hay DOM ni navegador en esos tests, así que
+componentes y animaciones se verifican a mano (ver abajo).
+
+Los imports relativos dentro de `src/lib` llevan extensión `.js` explícita para que
+Node pueda cargar los módulos sin bundler.
 
 ## Docker
 

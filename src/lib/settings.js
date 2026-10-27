@@ -1,5 +1,5 @@
-import { LOGO_DATA_PATTERN, LOGO_INLINE_MAX_CHARS } from './logo';
-import { clamp, normalizeHex, parseParticipants } from './utils';
+import { LOGO_DATA_PATTERN, LOGO_INLINE_MAX_CHARS } from './logo.js';
+import { clamp, normalizeHex, parseParticipants } from './utils.js';
 
 export const STORAGE_KEY = 'ruleta-rifas:settings:v1';
 

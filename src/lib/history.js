@@ -1,4 +1,4 @@
-import { MAX_NAME_LENGTH } from './utils';
+import { MAX_NAME_LENGTH } from './utils.js';
 
 export const WINNERS_KEY = 'ruleta-rifas:winners:v1';
 
