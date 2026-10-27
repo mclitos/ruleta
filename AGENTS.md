@@ -38,6 +38,9 @@ ch.addEventListener('message', (e) => e.data.type === 'round' && console.log(e.d
 
 // Configuración persistida
 JSON.parse(localStorage.getItem('ruleta-rifas:settings:v1'));
+
+// Historial persistido (array, más reciente primero)
+JSON.parse(localStorage.getItem('ruleta-rifas:winners:v1'));
 ```
 
 El contenedor sirve `GET /healthz` para el healthcheck. Con Playwright podés abrir
@@ -54,6 +57,8 @@ ganador.
 | `src/components/Reel.jsx` | Tira animada y barra del medio |
 | `src/components/SetupModal.jsx` | Configuración completa |
 | `src/lib/settings.js` | Defaults, límites, `sanitizeSettings`, `loadStoredSettings` |
+| `src/lib/history.js` | Clave y tope del historial, `sanitizeWinners`, `prependWinner` |
+| `src/hooks/useLocalStorage.js` | Persistencia genérica con saneado al leer |
 | `src/lib/stream.js` | Canal, constantes y URL del modo stream |
 | `src/lib/utils.js` | `secureRandomIndex`, color, contraste, portapapeles |
 
@@ -82,8 +87,11 @@ Detalle en [docs/arquitectura.md](docs/arquitectura.md) y
 
 - **`autoRemove` activo borra participantes en cada giro de prueba.** Desactivalo
   antes de probar y restaurá la lista. Es la causa número uno de "perdí mis datos".
-- **El historial de ganadores no se persiste.** Recargar lo borra; está anotado en
-  [BACKLOG.md](BACKLOG.md).
+- **El historial de ganadores sí se persiste** en `ruleta-rifas:winners:v1`, con tope
+  de 500. El panel renderiza las últimas 80 (`VISIBLE_LIMIT`): 500 filas animadas
+  hacen que cada inserción recalcule el layout de todas.
+- **El `id` del historial es un UUID, no el `round.id`.** El contador de rondas
+  arranca en 1 en cada carga, así que reusarlo choca con las entradas persistidas.
 - **`navigator.clipboard` no existe en HTTP plano** (por ejemplo
   `http://192.168.x.x:8125`). `copyText` cae a un `textarea` + `execCommand`.
 - **La fuente de navegador de OBS no comparte sesión** del navegador, así que no

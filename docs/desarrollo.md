@@ -76,8 +76,10 @@ Con Playwright (o el navegador a mano) se puede comprobar mucho sin mirar a ojo:
 
 - **`autoRemove` activo borra participantes en cada giro de prueba.** Desactivalo
   antes de probar y restaurá la lista al terminar.
-- **El historial no persiste.** Si necesitás el registro de una sesión, copialo antes
-  de recargar.
+- **El historial sí persiste**, en `ruleta-rifas:winners:v1`. Para probar desde cero,
+  limpiá esa clave además de la configuración, o usá **Limpiar** en el panel.
+- **El panel renderiza sólo las últimas 80 entradas** aunque guarde 500. Si agregás
+  algo por fila, mirá `VISIBLE_LIMIT` en `WinnersPanel`.
 - **`navigator.clipboard` no existe en HTTP plano.** Por eso `copyText()` cae a un
   `textarea` + `document.execCommand('copy')` en accesos por IP de LAN.
 - **Las dos ventanas del stream comparten perfil de navegador.** Otra máquina u otro

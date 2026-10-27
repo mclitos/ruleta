@@ -25,7 +25,7 @@ stream** sin controles pensada para OBS o un segundo monitor.
 | Duración | Rango configurable (1–15 s, pasos de 0,5 s); cada giro sortea un tiempo adentro |
 | Ambientación | Tema claro/oscuro, paleta con presets (hasta 12 colores), sonidos sintetizados, confeti |
 | Identidad | Título, frase y logo propio (URL o archivo local, con opción de ocultarlo) |
-| Historial | Ganadores de la sesión con hora, copiables al portapapeles |
+| Historial | Ganadores con hora, guardados en el navegador (hasta 500), copiables |
 | Modo stream | Segunda ventana sincronizada, fondo normal, transparente o croma verde |
 | Accesibilidad | Teclado, `aria-live` con el ganador y `prefers-reduced-motion` respetado |
 

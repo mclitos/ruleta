@@ -11,6 +11,13 @@ function winnersToText(winners) {
   return [`Lista de Ganadores (${winners.length})`, ...lines].join('\n');
 }
 
+/**
+ * The stored history can reach 500 entries; rendering that many animated rows
+ * makes every insert recompute the layout of all of them. Showing the newest
+ * slice keeps the panel cheap while Copiar still exports the whole history.
+ */
+const VISIBLE_LIMIT = 80;
+
 export function WinnersPanel({ winners, remaining, onClear }) {
   const [copyState, setCopyState] = useState('idle');
   const timerRef = useRef(null);
@@ -27,6 +34,8 @@ export function WinnersPanel({ winners, remaining, onClear }) {
 
   const copyLabel = copyState === 'copied' ? 'Copiado' : copyState === 'failed' ? 'Falló' : 'Copiar';
   const isEmpty = winners.length === 0;
+  const visible = winners.slice(0, VISIBLE_LIMIT);
+  const hidden = winners.length - visible.length;
 
   return (
     <div className="card flex h-full flex-col overflow-hidden">
@@ -38,7 +47,9 @@ export function WinnersPanel({ winners, remaining, onClear }) {
           <div>
             <h2 className="text-sm font-extrabold tracking-wide text-ink">Ganadores</h2>
             <p className="text-xs font-medium text-ink-soft">
-              {winners.length === 0 ? 'Sin sorteos todavía' : `${winners.length} en esta sesión`}
+              {winners.length === 0
+                ? 'Sin sorteos todavía'
+                : `${winners.length} ${winners.length === 1 ? 'guardado' : 'guardados'}`}
             </p>
           </div>
         </div>
@@ -104,37 +115,44 @@ export function WinnersPanel({ winners, remaining, onClear }) {
             </div>
           </div>
         ) : (
-          <ol className="space-y-1.5">
-            <AnimatePresence initial={false}>
-              {winners.map((winner, index) => (
-                <motion.li
-                  key={winner.id}
-                  layout
-                  initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                  transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-                  className="flex items-center gap-3 overflow-hidden rounded-xl border border-line/60 bg-surface-2/40 px-3 py-2.5"
-                >
-                  <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-accent/15 text-[0.65rem] font-extrabold text-accent">
-                    {winners.length - index}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-sm font-bold text-ink">
-                    {winner.name}
-                  </span>
-                  <span className="shrink-0 text-[11px] font-semibold tabular-nums text-ink-soft">
-                    {formatTime(winner.at)}
-                  </span>
-                </motion.li>
-              ))}
-            </AnimatePresence>
-          </ol>
+          <>
+            <ol className="space-y-1.5">
+              <AnimatePresence initial={false}>
+                {visible.map((winner, index) => (
+                  <motion.li
+                    key={winner.id}
+                    layout
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                    className="flex items-center gap-3 overflow-hidden rounded-xl border border-line/60 bg-surface-2/40 px-3 py-2.5"
+                  >
+                    <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-accent/15 text-[0.65rem] font-extrabold text-accent">
+                      {winners.length - index}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-sm font-bold text-ink">
+                      {winner.name}
+                    </span>
+                    <span className="shrink-0 text-[11px] font-semibold tabular-nums text-ink-soft">
+                      {formatTime(winner.at)}
+                    </span>
+                  </motion.li>
+                ))}
+              </AnimatePresence>
+            </ol>
+            {hidden > 0 && (
+              <p className="px-2 pt-2 text-center text-[11px] font-medium text-ink-soft">
+                Mostrando los últimos {VISIBLE_LIMIT} de {winners.length}. Copiar incluye todo.
+              </p>
+            )}
+          </>
         )}
       </div>
 
       <footer className="border-t border-line/70 px-5 py-3">
         <p className="text-[11px] font-medium leading-snug text-ink-soft">
-          El historial vive solo en esta pestaña: se borra al recargar.
+          El historial queda guardado en este navegador. Limpiar lo borra para siempre.
         </p>
       </footer>
     </div>

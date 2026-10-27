@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { mod, secureRandomIndex } from '../lib/utils';
+import { WINNERS_KEY, createWinnerId, prependWinner, sanitizeWinners } from '../lib/history';
+import { useLocalStorage } from './useLocalStorage';
 
 /**
  * Owns the raffle state machine: idle -> spinning -> revealed.
@@ -9,7 +11,9 @@ import { mod, secureRandomIndex } from '../lib/utils';
 export function useRaffle({ settings, setSettings, onReveal }) {
   const [phase, setPhase] = useState('idle');
   const [round, setRound] = useState(null);
-  const [winners, setWinners] = useState([]);
+  // The history outlives the session: `autoRemove` already persists the list, so
+  // losing who won would leave drawn names gone with no record of them.
+  const [winners, setWinners] = useLocalStorage(WINNERS_KEY, [], sanitizeWinners);
 
   const roundRef = useRef(null);
   const counterRef = useRef(0);
@@ -69,8 +73,8 @@ export function useRaffle({ settings, setSettings, onReveal }) {
     lockedRef.current = false;
     setPhase('revealed');
 
-    const entry = { id: current.id, name: current.winner, at: Date.now() };
-    setWinners((previous) => [entry, ...previous]);
+    const entry = { id: createWinnerId(current.id), name: current.winner, at: Date.now() };
+    setWinners((previous) => prependWinner(previous, entry));
 
     if (typeof revealRef.current === 'function') {
       revealRef.current(current.winner);
@@ -89,15 +93,7 @@ export function useRaffle({ settings, setSettings, onReveal }) {
 
   const clearHistory = useCallback(() => {
     setWinners([]);
-  }, []);
-
-  const resetSession = useCallback(() => {
-    lockedRef.current = false;
-    roundRef.current = null;
-    setRound(null);
-    setWinners([]);
-    setPhase('idle');
-  }, []);
+  }, [setWinners]);
 
   return {
     phase,
@@ -108,6 +104,5 @@ export function useRaffle({ settings, setSettings, onReveal }) {
     spin,
     completeSpin,
     clearHistory,
-    resetSession,
   };
 }

@@ -11,7 +11,7 @@ export function mod(value, divisor) {
 }
 
 const MAX_PARTICIPANTS = 5000;
-const MAX_NAME_LENGTH = 120;
+export const MAX_NAME_LENGTH = 120;
 
 export function parseParticipants(text) {
   if (typeof text !== 'string') return [];

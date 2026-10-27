@@ -266,7 +266,7 @@ export default function App() {
           </div>
 
           <p className="text-center text-[11px] font-medium text-ink-soft">
-            Tus ajustes quedan guardados en este navegador. El historial de ganadores no.
+            Tus ajustes y el historial de ganadores quedan guardados en este navegador.
           </p>
         </main>
       </div>

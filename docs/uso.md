@@ -86,14 +86,16 @@ un rango inválido. Poné mínimo igual a máximo si querés un tiempo fijo. Con
 
 ## Historial
 
-- Guarda cada ganador con su hora local.
+- Guarda cada ganador con su hora local y **sobrevive a recargar**: la clave
+  `ruleta-rifas:winners:v1` guarda hasta 500 entradas, las más recientes primero.
 - **Copiar** arma un texto con la lista completa para pegar donde quieras. En HTTP
   plano (por ejemplo `http://192.168.x.x:8125`) usa un fallback porque
   `navigator.clipboard` sólo existe en contexto seguro.
-- **Borrar** vacía el historial de la sesión.
-- El historial **no se persiste**: recargar lo limpia. La lista de participantes sí
-  se conserva tal como quedó, incluidos los ya sorteados si «quitar ganador» está
-  activo. Esto está anotado en [BACKLOG.md](../BACKLOG.md).
+- **Limpiar** borra el historial guardado, sin confirmación y sin vuelta atrás.
+- El panel muestra los últimos 80 para no animar 500 filas; **Copiar** exporta todo.
+- Como el historial persiste y «quitar ganador» también, después de recargar siguen
+  los nombres restantes y el registro de quiénes ganaron. Antes se perdía el registro
+  y los nombres ya no estaban en la lista.
 
 ## Qué se guarda y dónde
 
@@ -103,9 +105,10 @@ un rango inválido. Poné mínimo igual a máximo si querés un tiempo fijo. Con
 | Rango de duración, título, frase, paleta | `localStorage` |
 | Logo (URL o `data:` URL) | `localStorage` |
 | Participantes | `localStorage` |
-| Historial de ganadores | Sólo en memoria (se pierde al recargar) |
+| Historial de ganadores | `localStorage`, hasta 500 entradas |
 | Estado del stream | Sólo en memoria (se rearma por el canal) |
 
-Clave usada: `ruleta-rifas:settings:v1`. Al leer, todo pasa por un saneado: valores
-fuera de rango se recortan, un color inválido se descarta, un logo inválido se
-ignora y un `max` menor que el `min` se corrige.
+Claves usadas: `ruleta-rifas:settings:v1` y `ruleta-rifas:winners:v1`. Al leer, todo
+pasa por un saneado: valores fuera de rango se recortan, un color inválido se
+descarta, un logo inválido se ignora, un `max` menor que el `min` se corrige y una
+entrada de historial sin nombre, sin hora válida o repetida se descarta.

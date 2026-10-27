@@ -2,23 +2,11 @@
 
 Pendientes acordados, ordenados por riesgo real. No son urgentes: la app funciona.
 
-## 1. Persistir el historial de ganadores
+Hecho: historial de ganadores persistido en `localStorage`
+(`ruleta-rifas:winners:v1`, tope de 500) y repo publicado en
+https://github.com/mclitos/ruleta.
 
-Hoy `winners` vive en memoria (`useRaffle`) y se pierde al recargar — el propio UI lo
-avisa. El problema es la combinación con `autoRemove`, que **sí** persiste: después de
-un reload los nombres ya no están en la lista, pero no queda registro de quiénes
-ganaron, así que no se puede retomar un sorteo al día siguiente.
-
-- Guardar `winners` en `localStorage` (clave propia, p. ej. `ruleta-rifas:winners:v1`).
-- Mantener el botón "borrar historial" existente como forma de limpiarlo.
-- Sanea al leer: ids numéricos, nombres string no vacíos, tope de entradas.
-
-## 2. `git init` + commits
-
-No hay repositorio: cualquier cambio se despliega sin red de seguridad. Crear el repo,
-un commit inicial y después commits por unidad de trabajo (código + docs juntos).
-
-## 3. Tests mínimos de lógica pura
+## 1. Tests mínimos de lógica pura
 
 Sin dependencias, con `node:test` sobre `src/lib/*`:
 
@@ -28,16 +16,18 @@ Sin dependencias, con `node:test` sobre `src/lib/*`:
   y con argumentos invertidos.
 - `secureRandomIndex`: valores dentro de `[0, n)` y sin sesgo evidente con `n` no
   potencia de dos.
+- `sanitizeWinners`: descarta basura, colapsa espacios, deduplica `id` y recorta al
+  tope de 500.
 
 El bug del stream reescribiendo `localStorage` lo hubiera cazado un test de saneado.
 
-## 4. Export / Import de configuración (JSON)
+## 2. Export / Import de configuración (JSON)
 
 Todo vive en el `localStorage` de un perfil de navegador. Al cambiar de máquina, de
 perfil o al limpiar datos se pierde logo (`data:` URL), paleta, participantes y
 ajustes. Un export/import JSON evita rehacerlo a mano.
 
-## 5. Ruleta en 3D (idea, para más adelante)
+## 3. Ruleta en 3D (idea, para más adelante)
 
 Reemplazo/alternativa visual del reel vertical por una rueda que gira en perspectiva.
 

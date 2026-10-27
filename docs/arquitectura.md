@@ -64,11 +64,18 @@ App (settings)
 
 | Pieza | Detalle |
 | --- | --- |
-| Clave | `ruleta-rifas:settings:v1` |
+| Claves | `ruleta-rifas:settings:v1` y `ruleta-rifas:winners:v1` |
 | Escritura | Sólo desde la pestaña de control (`useLocalStorage`) |
-| Lectura | Control y stream (`loadStoredSettings`) |
-| Saneado | Siempre al leer: rangos, booleanos, colores, logo, lista |
-| Historial | En memoria, a propósito (ver [BACKLOG.md](../BACKLOG.md)) |
+| Lectura | Control y stream (`loadStoredSettings`); el stream no escribe nada |
+| Saneado | Siempre al leer: rangos, booleanos, colores, logo, lista, historial |
+| Historial | Persistido, tope de 500 entradas, las más recientes primero |
+| Render del historial | Ventana de 80 filas; `Copiar` exporta las 500 |
+
+El historial usa una clave propia y no va dentro de `settings` por dos motivos:
+guardar la configuración reescribe el objeto entero (borraría el historial), y cada
+ganador es un registro con su propia vida, no un ajuste. El `id` de cada entrada es
+un UUID y no el `round.id`, porque el contador de rondas arranca en 1 en cada carga
+y las claves de React colisionarían con las entradas persistidas.
 
 El tema se aplica **antes del primer paint** con un script inline en `index.html`:
 lee la configuración guardada y setea la clase `dark` y `color-scheme`, así no hay

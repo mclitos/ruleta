@@ -65,7 +65,8 @@ siempre la tres antes del final.
 Al completarse:
 
 1. Se marca el giro como completado y se libera el lock.
-2. Se agrega el ganador al historial con `Date.now()`.
+2. Se agrega el ganador al historial con `Date.now()`, se le da un `id` propio y se
+   persiste en `localStorage` (tope de 500, más reciente primero).
 3. Si **quitar ganador** está activo, se filtra la lista por índice.
 4. Se dispara la fanfarria y el confeti.
 
