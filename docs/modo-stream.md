@@ -39,6 +39,7 @@ la ventana del stream refleja; no hay servidor ni WebSocket.
 | `state` | Cambia la configuración | Propagar tema, paleta, título, logo y lista en vivo |
 | `round` | Arranca un giro | Pasar la tira armada y la `duration` sorteada |
 | `result` | El stream revela | Compartir el ganador ya revelado |
+| `reset` | Se guarda una lista de participantes distinta | Volver al reel quieto y soltar al ganador anterior |
 | `round-complete` | El stream termina la animación | Registrar la ronda cuando el control no animó |
 | `heartbeat` | Cada 2 s | Detectar que la ventana sigue viva |
 
@@ -53,6 +54,10 @@ muestra.
   su reel no anima, la ventana del stream cierra la ronda y avisa.
 - **Enganche en caliente**: abrir la ventana a mitad de un giro la suma a ese giro; si
   el ganador ya está revelado, muestra ese ganador.
+- **Nueva rifa**: al guardar una lista de participantes distinta, el control cierra
+  la ronda y manda `reset`. Las dos ventanas vuelven a *Listo para sortear* con la
+  lista nueva y el historial queda intacto. Guardar sin cambiar la lista no toca el
+  ganador en pantalla.
 - **Arranca con los ajustes guardados**, no con los defaults. Esto importa en OBS,
   donde la ventana suele abrir antes que la pestaña de control.
 - La ventana del stream **lee** los ajustes pero **nunca los escribe**. Si escribiera,

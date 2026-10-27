@@ -7,6 +7,7 @@ import {
   SPIN_CEILING,
   SPIN_FLOOR,
   STORAGE_KEY,
+  hasSameParticipants,
   isAllowedLogoUrl,
   loadStoredSettings,
   randomSpinDuration,
@@ -211,5 +212,25 @@ describe('loadStoredSettings', () => {
   test('survives malformed JSON', () => {
     stubStorage({ [STORAGE_KEY]: '{not json' });
     assert.deepEqual(loadStoredSettings(), DEFAULT_SETTINGS);
+  });
+});
+
+describe('hasSameParticipants', () => {
+  test('treats the same list in the same order as unchanged', () => {
+    assert.equal(hasSameParticipants(['Ana', 'Beto'], ['Ana', 'Beto']), true);
+    assert.equal(hasSameParticipants([], []), true);
+  });
+
+  test('detects a longer, a shorter, a renamed and a reordered list', () => {
+    assert.equal(hasSameParticipants(['Ana'], ['Ana', 'Beto']), false);
+    assert.equal(hasSameParticipants(['Ana', 'Beto'], ['Ana']), false);
+    assert.equal(hasSameParticipants(['Ana', 'Beto'], ['Ana', 'Beto Dos']), false);
+    // Order drives the reel, so a reorder is a different raffle.
+    assert.equal(hasSameParticipants(['Ana', 'Beto'], ['Beto', 'Ana']), false);
+  });
+
+  test('treats a missing list as empty', () => {
+    assert.equal(hasSameParticipants(undefined, []), true);
+    assert.equal(hasSameParticipants(null, ['Ana']), false);
   });
 });

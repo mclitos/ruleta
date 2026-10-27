@@ -95,6 +95,20 @@ export function useRaffle({ settings, setSettings, onReveal }) {
     setWinners([]);
   }, [setWinners]);
 
+  /**
+   * Cancels the live round without touching the history: the winner stays in the
+   * record but stops being the live result. Changing the list owns the transition
+   * and must win over an animation still in flight, so this also releases the lock
+   * (a late `onComplete` finds no round and returns early). Skipping the reset
+   * would leave the previous winner on screen and the tab unable to spin again.
+   */
+  const resetRound = useCallback(() => {
+    roundRef.current = null;
+    lockedRef.current = false;
+    setRound(null);
+    setPhase('idle');
+  }, []);
+
   return {
     phase,
     round,
@@ -104,5 +118,6 @@ export function useRaffle({ settings, setSettings, onReveal }) {
     spin,
     completeSpin,
     clearHistory,
+    resetRound,
   };
 }

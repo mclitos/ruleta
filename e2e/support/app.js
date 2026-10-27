@@ -37,7 +37,9 @@ export async function openApp(page, overrides = {}) {
 }
 
 export function spin(page) {
-  return page.getByRole('button', { name: /^Girar/ }).click();
+  // Input only reliably reaches the active tab: the browser throttles a
+  // background page, so a click or a `fill` there can be dropped or delayed.
+  return page.bringToFront().then(() => page.getByRole('button', { name: /^Girar/ }).click());
 }
 
 export function winnerStatus(page) {

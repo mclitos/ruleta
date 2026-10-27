@@ -48,6 +48,13 @@ rango (leída del `BroadcastChannel`), barra espaciadora, lista vacía, sincron�
 la ventana de stream, que el stream no escriba `localStorage`, `prefers-reduced-motion`
 y el anuncio `aria-live` del ganador.
 
+Los tests trabajan sobre la **pestaña activa**. El navegador frena una pestaña de
+fondo, y ahí un click o un `fill` puede perderse sin error: `spin()` y los helpers
+que escriben llaman a `page.bringToFront()` antes de interactuar. Además `fill`
+sobre el textarea de participantes se descartaba de vez en cuando, así que se escribe
+con teclado (`ControlOrMeta+a` + `insertText`) y se comprueba el valor antes de
+guardar. Si un test escribe algo, que lo afirme antes de seguir.
+
 Los artefactos de fallo (`test-results/`, `playwright-report/`) están ignorados por
 git.
 

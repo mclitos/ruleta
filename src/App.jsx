@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import { DEFAULT_SETTINGS, STORAGE_KEY, randomSpinDuration, sanitizeSettings } from './lib/settings';
+import {
+  DEFAULT_SETTINGS,
+  STORAGE_KEY,
+  hasSameParticipants,
+  randomSpinDuration,
+  sanitizeSettings,
+} from './lib/settings';
 import { celebrate } from './lib/celebrate';
 import { STREAM_TIMEOUT_MS, createChannel, streamBackgroundUrl, streamUrl } from './lib/stream';
 import { useLocalStorage } from './hooks/useLocalStorage';
@@ -161,8 +167,19 @@ export default function App() {
   };
 
   const handleSave = (next) => {
-    setSettings(sanitizeSettings(next));
+    const clean = sanitizeSettings(next);
     setSetupOpen(false);
+
+    // A finished round belongs to the list that produced it: saving a different
+    // list starts a new raffle, so the reveal must stop being the live result.
+    if (!hasSameParticipants(settings.participants, clean.participants)) {
+      raffle.resetRound();
+      liveRoundRef.current = null;
+      resultRef.current = null;
+      channelRef.current?.postMessage({ type: 'reset' });
+    }
+
+    setSettings(clean);
   };
 
   useEffect(() => {

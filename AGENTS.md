@@ -90,6 +90,10 @@ Detalle en [docs/arquitectura.md](docs/arquitectura.md) y
   booleanos, colores, logo y lista se recortan siempre al leer.
 - **Sin backend.** Nada de fetch a servicios propios, ni WebSocket, ni variables de
   entorno. Si un pedido parece necesitar servidor, preguntá antes.
+- **Guardar otra lista cierra la ronda.** Si cambian los participantes, el control
+  vuelve a `idle`, suelta el lock y manda `reset` al stream; el historial no se toca
+  y `resetRound()` nunca falla por una animación en curso. No resetees por
+  `autoRemove`: el ganador tiene que quedar a la vista.
 - **La duración del giro es siempre aleatoria dentro del rango.** Es una decisión
   del producto, no un default: no agregues un modo "tiempo exacto". El rango usa
   paso de 0,5 s entre 1 y 15 s y el saneado fuerza `spinMax >= spinMin`.

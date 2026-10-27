@@ -70,6 +70,16 @@ export default function StreamView() {
         setSettings(sanitizeSettings(data.settings));
         return;
       }
+      if (data.type === 'reset') {
+        // The control page started a new raffle: back to the idle reel, without
+        // touching the winner history it already recorded.
+        stopTicks();
+        roundRef.current = null;
+        setRound(null);
+        setLastWinner('');
+        setPhase('idle');
+        return;
+      }
       if (data.type === 'result' && data.round && phaseRef.current !== 'spinning') {
         // Opened after the reveal: land on the winner that the control page is
         // already showing, without replaying the sound or the confetti.

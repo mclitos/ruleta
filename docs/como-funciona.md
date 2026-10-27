@@ -4,6 +4,13 @@ La idea central: **el ganador se elige antes de animar, y la animación sólo lo
 revela**. Nunca se decide al frenar, así que lo que se ve y lo que se registra no
 pueden discrepar.
 
+## Nueva rifa
+
+Después de un sorteo, cambiá la lista en **Configurar sorteo** y guardá. La ruleta
+vuelve a *Listo para sortear* con la lista nueva, también en la ventana de stream, y
+el ganador anterior queda sólo en el historial. Si guardás sin cambiar la lista, el
+resultado sigue en pantalla.
+
 ## Camino rápido
 
 1. Se sortea el índice del ganador con azar criptográfico.

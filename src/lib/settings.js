@@ -173,6 +173,17 @@ export function sanitizePalette(input) {
   return palette.length > 0 ? palette : [...DEFAULT_PALETTE];
 }
 
+/**
+ * Compares participant lists position by position: the reel order is part of the
+ * configuration, so renaming or reordering counts as a different list.
+ */
+export function hasSameParticipants(previous, next) {
+  const before = Array.isArray(previous) ? previous : [];
+  const after = Array.isArray(next) ? next : [];
+  if (before.length !== after.length) return false;
+  return before.every((name, index) => name === after[index]);
+}
+
 export function sanitizeSettings(input) {
   const source = input && typeof input === 'object' ? input : {};
 
