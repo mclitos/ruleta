@@ -14,22 +14,28 @@ pestaña de control por `BroadcastChannel`. Documentación para humanos en
 | `npm run build` | Genera `dist/` |
 | `npm run preview` | Sirve `dist/` localmente |
 | `npm test` | Tests de lógica pura en `src/lib/*.test.js` (`node:test`, sin dependencias) |
+| `npm run test:e2e` | Playwright sobre la build: giro, stream, `autoRemove`, recarga |
+| `npm run test:all` | Unitarios y e2e juntos |
 | `docker compose up -d --build` | Deploy en `http://localhost:8125`, contenedor `ruleta-de-rifas` |
 
-No hay lint ni CI. Los tests cubren sólo lógica pura de `src/lib`; el resto se
-verifica a mano y está descrito abajo. No agregues dependencias de testing (ni
-Vitest, ni Testing Library) sin que te lo pidan: `node:test` alcanza y no suma
-bundle.
+No hay lint ni CI. Hay dos capas de tests: `npm test` cubre lógica pura de
+`src/lib` con `node:test` (sin dependencias) y `npm run test:e2e` cubre lo que
+necesita navegador con Playwright. No agregues otra cosa de testing (ni Vitest, ni
+Testing Library, ni Jest) sin que te lo pidan: entre las dos capas ya está
+cubierto y `@playwright/test` es la única dependencia de desarrollo que no esbuild.
 
 ## Verificación
 
 Después de tocar `src/`:
 
 1. `npm test` en verde (si tocaste `src/lib`).
-2. `npm run build` sin errores ni warnings nuevos.
-3. `docker compose up -d --build`, y `docker compose ps` en `healthy`.
-4. Un giro completo revela un ganador y lo registra **una sola vez**.
-5. La configuración y el historial sobreviven a recargar.
+2. `npm run test:e2e` en verde (si tocaste `src/`, `index.html` o el flujo del giro).
+   Compila y sirve la build en el puerto 4173 por su cuenta; la primera vez
+   necesita `npx playwright install chromium`.
+3. `npm run build` sin errores ni warnings nuevos.
+4. `docker compose up -d --build`, y `docker compose ps` en `healthy`.
+5. Un giro completo revela un ganador y lo registra **una sola vez**.
+6. La configuración y el historial sobreviven a recargar.
 
 Cambiar sólo `*.md` no requiere rebuild.
 
@@ -64,6 +70,7 @@ ganador.
 | `src/lib/history.js` | Clave y tope del historial, `sanitizeWinners`, `prependWinner` |
 | `src/hooks/useLocalStorage.js` | Persistencia genérica con saneado al leer |
 | `src/lib/stream.js` | Canal, constantes y URL del modo stream |
+| `e2e/*.spec.js` | Playwright: giro, idempotencia, `autoRemove`, stream, `prefers-reduced-motion` |
 | `src/lib/utils.js` | `secureRandomIndex`, color, contraste, portapapeles |
 
 Detalle en [docs/arquitectura.md](docs/arquitectura.md) y

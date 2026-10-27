@@ -19,6 +19,8 @@ npm run dev       # http://localhost:5173 (host expuesto en la red local)
 npm run build     # genera dist/
 npm run preview   # sirve dist/ localmente
 npm test          # tests de lógica pura de src/lib (node:test)
+npm run test:e2e  # Playwright sobre la build, en el puerto 4173
+npm run test:all  # las dos capas
 ```
 
 No hay lint ni CI. `npm test` corre `node --test` sobre `src/lib/*.test.js`:
@@ -28,6 +30,26 @@ componentes y animaciones se verifican a mano (ver abajo).
 
 Los imports relativos dentro de `src/lib` llevan extensión `.js` explícita para que
 Node pueda cargar los módulos sin bundler.
+
+### Tests de navegador (`e2e/`)
+
+`npm run test:e2e` corre Playwright **contra la build de producción**, no contra el
+dev server: el `webServer` de `playwright.config.js` hace `npm run build` y sirve
+`dist/` con `vite preview` en el puerto 4173. Así se prueba el mismo artefacto que
+sirve Docker. La primera vez hay que bajar el navegador:
+
+```bash
+npx playwright install chromium
+```
+
+Cubre lo que `node:test` no puede: giro completo con revelado, registro único en el
+historial, `autoRemove`, persistencia al recargar, duración sorteada dentro del
+rango (leída del `BroadcastChannel`), barra espaciadora, lista vacía, sincronía con
+la ventana de stream, que el stream no escriba `localStorage`, `prefers-reduced-motion`
+y el anuncio `aria-live` del ganador.
+
+Los artefactos de fallo (`test-results/`, `playwright-report/`) están ignorados por
+git.
 
 ## Docker
 

@@ -48,6 +48,7 @@ stream** sin controles pensada para OBS o un segundo monitor.
 | Vite | 8 | Build y dev server |
 | Tailwind | 4 | Estilos |
 | Framer Motion | 14 | Animación del reel |
+| Playwright | 1.59 | Tests de navegador (sólo desarrollo) |
 | canvas-confetti | 1.9 | Confeti del ganador |
 
 Sin dependencias de servidor. Las fuentes (Archivo Black y Outfit variable) se
@@ -55,10 +56,11 @@ sirven desde el propio bundle, así que no hay pedidos a Google Fonts.
 
 ## Verificación de un cambio
 
+- [ ] `npm test` y `npm run test:e2e` terminan en verde.
 - [ ] `npm run build` termina sin errores.
 - [ ] `docker compose up -d --build` deja el contenedor `healthy`.
 - [ ] En `http://localhost:8125` el giro revela un ganador y lo registra una sola vez.
-- [ ] La configuración sobrevive a recargar la página.
+- [ ] La configuración y el historial sobreviven a recargar la página.
 - [ ] Si tocaste el modo stream, la ventana sigue a la pestaña de control.
 
 ## Siguiente paso

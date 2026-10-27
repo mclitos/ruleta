@@ -15,3 +15,6 @@ yarn-error.log*
 # Material ajeno a este proyecto: el paquete de skills queda en disco (con su
 # propio AGENTS.md) pero no se publica con la ruleta.
 skills/
+test-results/
+playwright-report/
+blob-report/
