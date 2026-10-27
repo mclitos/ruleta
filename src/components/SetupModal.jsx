@@ -12,11 +12,18 @@ import {
   isAllowedLogoUrl,
 } from '../lib/settings';
 import { logoFromFile } from '../lib/logo';
-import { cn, normalizeHex, parseParticipants } from '../lib/utils';
+import {
+  MAX_PARTICIPANTS,
+  cn,
+  normalizeHex,
+  numberParticipants,
+  parseParticipants,
+} from '../lib/utils';
 import {
   ArrowUpDown,
   Check,
   Eraser,
+  Hash,
   ImageIcon,
   Moon,
   Palette,
@@ -71,6 +78,7 @@ function SetupDialog({ settings, onClose, onSave }) {
     participantsText: settings.participants.join('\n'),
   }));
   const [logoBusy, setLogoBusy] = useState(false);
+  const [numberCount, setNumberCount] = useState('100');
   const [logoFileError, setLogoFileError] = useState('');
   const firstFieldRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -157,6 +165,21 @@ function SetupDialog({ settings, onClose, onSave }) {
       return true;
     });
     update({ participantsText: unique.join('\n') });
+  };
+
+  const numberTotal = Math.floor(Number(numberCount));
+  const canFillNumbers = Number.isFinite(numberTotal) && numberTotal >= 1;
+
+  /** Never show a count the generator will silently cap at the list limit. */
+  const changeNumberCount = (value) => {
+    const total = Math.floor(Number(value));
+    setNumberCount(Number.isFinite(total) && total > MAX_PARTICIPANTS ? String(MAX_PARTICIPANTS) : value);
+  };
+
+  /** Replaces the list with `1..N`: a raffle by numbers instead of by names. */
+  const fillNumbers = () => {
+    if (!canFillNumbers) return;
+    update({ participantsText: numberParticipants(numberTotal).join('\n') });
   };
 
   const handleSubmit = (event) => {
@@ -354,6 +377,33 @@ function SetupDialog({ settings, onClose, onSave }) {
                 >
                   Vaciar
                 </QuickAction>
+                <div className="inline-flex items-center gap-1 rounded-lg border border-line bg-surface py-1 pl-2 pr-1">
+                  <Hash size={12} className="shrink-0 text-ink-soft" />
+                  <input
+                    type="number"
+                    min={1}
+                    max={MAX_PARTICIPANTS}
+                    step={1}
+                    inputMode="numeric"
+                    value={numberCount}
+                    onChange={(event) => changeNumberCount(event.target.value)}
+                    aria-label="Cantidad de números"
+                    className="w-11 bg-transparent text-[11px] font-bold tabular-nums text-ink outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={fillNumbers}
+                    aria-disabled={!canFillNumbers}
+                    className={cn(
+                      'rounded-md px-2 py-0.5 text-[11px] font-bold transition',
+                      canFillNumbers
+                        ? 'text-ink hover:bg-ink/5'
+                        : 'cursor-not-allowed text-ink-soft/50',
+                    )}
+                  >
+                    Rifa por número
+                  </button>
+                </div>
                 {uniqueCount !== parsed.length ? (
                   <span className="ml-auto text-[11px] font-bold text-ink-soft">
                     {uniqueCount} únicos

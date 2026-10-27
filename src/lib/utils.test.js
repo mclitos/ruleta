@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test, { afterEach, describe } from 'node:test';
 import {
   MAX_NAME_LENGTH,
+  MAX_PARTICIPANTS,
   clamp,
   formatTime,
   initials,
@@ -9,6 +10,7 @@ import {
   mixHex,
   mod,
   normalizeHex,
+  numberParticipants,
   parseParticipants,
   secureRandomIndex,
   shadeHex,
@@ -175,5 +177,29 @@ describe('formatTime', () => {
 
   test('returns an empty string for an unusable timestamp', () => {
     assert.equal(formatTime(Number.NaN), '');
+  });
+});
+
+describe('numberParticipants', () => {
+  test('builds a raffle by numbers from 1 to the requested count', () => {
+    assert.deepEqual(numberParticipants(5), ['1', '2', '3', '4', '5']);
+    assert.deepEqual(numberParticipants(1), ['1']);
+  });
+
+  test('accepts the text a number input reports', () => {
+    assert.deepEqual(numberParticipants('12'), ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']);
+  });
+
+  test('truncates fractions and caps the list at the participant limit', () => {
+    assert.equal(numberParticipants(3.9).length, 3);
+    const capped = numberParticipants(MAX_PARTICIPANTS + 250);
+    assert.equal(capped.length, MAX_PARTICIPANTS);
+    assert.equal(capped.at(-1), String(MAX_PARTICIPANTS));
+  });
+
+  test('returns an empty list when the count is not a usable number', () => {
+    for (const value of [0, -4, Number.NaN, '', '   ', 'abc', null, undefined]) {
+      assert.deepEqual(numberParticipants(value), [], `expected [] for ${String(value)}`);
+    }
   });
 });

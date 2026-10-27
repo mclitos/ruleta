@@ -58,6 +58,15 @@ Si no hay logo configurado, se usa el logo de la ruleta dibujado en la app.
 No se permiten duplicados exactos sólo si vos los escribís: la app no deduplica,
 así que dos «Juan» son dos participaciones.
 
+**Rifa por número.** Cuando la rifa se juega con números (talones, cartones,
+puestos), en vez de escribir 500 líneas usá el campo de cantidad que está al lado
+de **Vaciar**: poné hasta cuántos números hay y tocá **Rifa por número**. La lista
+se reemplaza por `1`, `2`, … , `N` y el sorteo funciona igual que con nombres.
+Sirve también con **Quitar ganador de la lista**, y si después querés volver a
+nombres, **Lista demo** o pegar tu lista de nuevo. Los números no se guardan como
+un modo aparte: son la lista de participantes, así que el historial y el stream no
+cambian.
+
 ### Paleta
 
 - Presets: **Clásica**, **Fiesta**, **Joya**, **Neón**, **Océano**.

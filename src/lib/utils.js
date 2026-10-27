@@ -10,8 +10,20 @@ export function mod(value, divisor) {
   return ((value % divisor) + divisor) % divisor;
 }
 
-const MAX_PARTICIPANTS = 5000;
+export const MAX_PARTICIPANTS = 5000;
 export const MAX_NAME_LENGTH = 120;
+
+/**
+ * Raffle by numbers: the participants become `1..count`, so the reel shows a
+ * number instead of a name. Out-of-range counts are clamped or ignored instead
+ * of throwing, because the value comes straight from a number input.
+ */
+export function numberParticipants(count) {
+  const total = Math.floor(Number(count));
+  if (!Number.isFinite(total) || total < 1) return [];
+  const size = Math.min(total, MAX_PARTICIPANTS);
+  return Array.from({ length: size }, (_, index) => String(index + 1));
+}
 
 export function parseParticipants(text) {
   if (typeof text !== 'string') return [];
