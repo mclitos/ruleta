@@ -14,6 +14,9 @@ import {
   resolveLogoSrc,
   sanitizePalette,
   sanitizeSettings,
+  buildSettingsExport,
+  exportSettingsFilename,
+  parseSettingsImport,
 } from './settings.js';
 
 const realWindow = globalThis.window;
@@ -232,5 +235,113 @@ describe('hasSameParticipants', () => {
   test('treats a missing list as empty', () => {
     assert.equal(hasSameParticipants(undefined, []), true);
     assert.equal(hasSameParticipants(null, ['Ana']), false);
+  });
+});
+
+describe('buildSettingsExport and exportSettingsFilename', () => {
+  test('wraps clean settings in a versioned envelope with ISO timestamp', () => {
+    const fixedDate = new Date('2026-10-29T15:30:00.000Z');
+    const backup = buildSettingsExport(
+      { title: 'Sorteo Especial', participants: ['Pedro', 'Marta'] },
+      fixedDate,
+    );
+
+    assert.equal(backup.app, 'ruleta-de-rifas');
+    assert.equal(backup.version, 1);
+    assert.equal(backup.exportedAt, '2026-10-29T15:30:00.000Z');
+    assert.equal(backup.settings.title, 'Sorteo Especial');
+    assert.deepEqual(backup.settings.participants, ['Pedro', 'Marta']);
+  });
+
+  test('generates expected filename with ISO date stamp', () => {
+    const fixedDate = new Date('2026-10-29T15:30:00.000Z');
+    assert.equal(exportSettingsFilename(null, fixedDate), 'ruleta-config-2026-10-29.json');
+  });
+});
+
+describe('parseSettingsImport', () => {
+  test('parses a valid exported backup envelope', () => {
+    const backup = {
+      app: 'ruleta-de-rifas',
+      version: 1,
+      exportedAt: '2026-10-29T15:30:00.000Z',
+      settings: {
+        title: 'Mi Rifa',
+        participants: ['Carlos', 'Diana'],
+        theme: 'light',
+      },
+    };
+
+    const result = parseSettingsImport(JSON.stringify(backup));
+    assert.equal(result.ok, true);
+    assert.equal(result.settings.title, 'Mi Rifa');
+    assert.deepEqual(result.settings.participants, ['Carlos', 'Diana']);
+    assert.equal(result.settings.theme, 'light');
+  });
+
+  test('accepts raw settings objects without envelope', () => {
+    const raw = {
+      title: 'Sin Sobre',
+      participants: ['Ana', 'Beto'],
+      palette: ['#ff0000', '#00ff00'],
+    };
+
+    const result = parseSettingsImport(JSON.stringify(raw));
+    assert.equal(result.ok, true);
+    assert.equal(result.settings.title, 'Sin Sobre');
+    assert.deepEqual(result.settings.participants, ['Ana', 'Beto']);
+    assert.deepEqual(result.settings.palette, ['#ff0000', '#00ff00']);
+  });
+
+  test('sanitizes dirty imported settings', () => {
+    const dirty = {
+      app: 'ruleta-de-rifas',
+      settings: {
+        spinMin: 99,
+        spinMax: 2,
+        palette: ['#xyz', '#123456'],
+        logoUrl: 'javascript:alert(1)',
+        participants: ['  Luna  ', '', 'Sol'],
+      },
+    };
+
+    const result = parseSettingsImport(JSON.stringify(dirty));
+    assert.equal(result.ok, true);
+    assert.equal(result.settings.spinMin, SPIN_CEILING);
+    assert.equal(result.settings.spinMax, SPIN_CEILING);
+    assert.deepEqual(result.settings.palette, ['#123456']);
+    assert.equal(result.settings.logoUrl, '');
+    assert.deepEqual(result.settings.participants, ['Luna', 'Sol']);
+  });
+
+  test('rejects non-string or empty input', () => {
+    assert.equal(parseSettingsImport('').ok, false);
+    assert.equal(parseSettingsImport('   ').ok, false);
+    assert.equal(parseSettingsImport(null).ok, false);
+  });
+
+  test('rejects malformed JSON', () => {
+    const result = parseSettingsImport('{bad json');
+    assert.equal(result.ok, false);
+    assert.match(result.error, /JSON válido/i);
+  });
+
+  test('rejects JSON primitives and arrays', () => {
+    assert.equal(parseSettingsImport('42').ok, false);
+    assert.equal(parseSettingsImport('"texto"').ok, false);
+    assert.equal(parseSettingsImport('true').ok, false);
+    assert.equal(parseSettingsImport('null').ok, false);
+  });
+
+  test('rejects unrelated JSON objects without recognizable keys', () => {
+    const result = parseSettingsImport(JSON.stringify({ foo: 'bar', count: 123 }));
+    assert.equal(result.ok, false);
+    assert.match(result.error, /no parece ser una configuración/i);
+  });
+
+  test('rejects configurations without participants', () => {
+    const result = parseSettingsImport(JSON.stringify({ title: 'Vacío', participants: [] }));
+    assert.equal(result.ok, false);
+    assert.match(result.error, /participantes válidos/i);
   });
 });

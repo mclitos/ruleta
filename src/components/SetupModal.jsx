@@ -9,12 +9,16 @@ import {
   SPIN_FLOOR,
   SPIN_STEP,
   SUGGESTED_COLORS,
+  buildSettingsExport,
+  exportSettingsFilename,
   isAllowedLogoUrl,
+  parseSettingsImport,
 } from '../lib/settings';
 import { logoFromFile } from '../lib/logo';
 import {
   MAX_PARTICIPANTS,
   cn,
+  downloadJsonFile,
   normalizeHex,
   numberParticipants,
   parseParticipants,
@@ -22,6 +26,7 @@ import {
 import {
   ArrowUpDown,
   Check,
+  Download,
   Eraser,
   Hash,
   ImageIcon,
@@ -80,8 +85,11 @@ function SetupDialog({ settings, onClose, onSave }) {
   const [logoBusy, setLogoBusy] = useState(false);
   const [numberCount, setNumberCount] = useState('100');
   const [logoFileError, setLogoFileError] = useState('');
+  const [backupNotice, setBackupNotice] = useState('');
+  const [backupError, setBackupError] = useState('');
   const firstFieldRef = useRef(null);
   const fileInputRef = useRef(null);
+  const backupFileInputRef = useRef(null);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -201,6 +209,54 @@ function SetupDialog({ settings, onClose, onSave }) {
       ...DEFAULT_SETTINGS,
       participantsText: DEFAULT_PARTICIPANTS.join('\n'),
     });
+  };
+
+  const handleExport = () => {
+    setBackupError('');
+    setBackupNotice('');
+    const exportData = {
+      ...draft,
+      title: draft.title.trim() || DEFAULT_SETTINGS.title,
+      slogan: draft.slogan.trim(),
+      logoUrl: draft.logoUrl.trim(),
+      palette: draft.palette.length > 0 ? draft.palette : DEFAULT_SETTINGS.palette,
+      participants: parsed,
+    };
+    const payload = buildSettingsExport(exportData);
+    const filename = exportSettingsFilename(exportData);
+    const ok = downloadJsonFile(filename, payload);
+    if (ok) {
+      setBackupNotice(`Archivo descargado: ${filename}`);
+    } else {
+      setBackupError('No se pudo iniciar la descarga del archivo');
+    }
+  };
+
+  const handleImportFile = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    setBackupError('');
+    setBackupNotice('');
+    try {
+      const text = await file.text();
+      const result = parseSettingsImport(text);
+      if (!result.ok) {
+        setBackupError(result.error);
+        return;
+      }
+
+      setDraft({
+        ...result.settings,
+        participantsText: result.settings.participants.join('\n'),
+      });
+      setBackupNotice(
+        `Configuración importada (${result.settings.participants.length} participantes). Hacé clic en Guardar para aplicar.`,
+      );
+    } catch {
+      setBackupError('No se pudo leer el archivo seleccionado');
+    }
   };
 
   return (
@@ -618,6 +674,57 @@ function SetupDialog({ settings, onClose, onSave }) {
                   </label>
                 </div>
               </div>
+            </Section>
+
+            <Section
+              icon={<Download size={15} />}
+              title="Copia de respaldo"
+              hint="Exportá tus participantes, logo y ajustes a un archivo JSON o restaurá una copia previa."
+            >
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface-2/60 px-3.5 py-2.5 text-xs font-bold text-ink transition hover:border-ink-soft/40 hover:bg-surface-2 active:translate-y-px"
+                >
+                  <Download size={14} />
+                  Exportar JSON
+                </button>
+                <button
+                  type="button"
+                  onClick={() => backupFileInputRef.current?.click()}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-line bg-surface-2/60 px-3.5 py-2.5 text-xs font-bold text-ink transition hover:border-ink-soft/40 hover:bg-surface-2 active:translate-y-px"
+                >
+                  <Upload size={14} />
+                  Importar JSON
+                </button>
+                <input
+                  ref={backupFileInputRef}
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleImportFile}
+                  className="hidden"
+                  aria-label="Archivo de configuración JSON a importar"
+                />
+              </div>
+
+              {backupNotice ? (
+                <p
+                  role="status"
+                  className="rounded-xl border border-accent/40 bg-accent/10 px-3.5 py-2 text-xs font-semibold text-ink"
+                >
+                  {backupNotice}
+                </p>
+              ) : null}
+
+              {backupError ? (
+                <p
+                  role="alert"
+                  className="rounded-xl border border-danger/30 bg-danger/10 px-3.5 py-2 text-xs font-semibold text-danger"
+                >
+                  {backupError}
+                </p>
+              ) : null}
             </Section>
           </div>
 

@@ -172,3 +172,24 @@ export function copyText(text) {
   }
   return Promise.resolve(legacyCopy(text));
 }
+
+/** Triggers a browser download for a JSON payload. */
+export function downloadJsonFile(filename, data) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  try {
+    const json = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+

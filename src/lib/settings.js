@@ -223,3 +223,87 @@ export function sanitizeSettings(input) {
     participants,
   };
 }
+
+export const BACKUP_APP_ID = 'ruleta-de-rifas';
+export const BACKUP_VERSION = 1;
+
+/** Wraps a sanitized copy of settings in a versioned envelope ready for JSON export. */
+export function buildSettingsExport(settings, date = new Date()) {
+  const clean = sanitizeSettings(settings);
+  const exportedAt =
+    date instanceof Date && !Number.isNaN(date.getTime())
+      ? date.toISOString()
+      : new Date().toISOString();
+
+  return {
+    app: BACKUP_APP_ID,
+    version: BACKUP_VERSION,
+    exportedAt,
+    settings: clean,
+  };
+}
+
+/** Generates a human-friendly filename with the export date. */
+export function exportSettingsFilename(_settings, date = new Date()) {
+  const stamp =
+    date instanceof Date && !Number.isNaN(date.getTime())
+      ? date.toISOString().slice(0, 10)
+      : 'ajustes';
+  return `ruleta-config-${stamp}.json`;
+}
+
+const RECOGNIZABLE_SETTING_KEYS = [
+  'participants',
+  'title',
+  'slogan',
+  'palette',
+  'theme',
+  'sounds',
+  'volume',
+  'confetti',
+  'autoRemove',
+  'spinMin',
+  'spinMax',
+  'logoUrl',
+  'logoData',
+  'logoHidden',
+];
+
+/**
+ * Validates and sanitizes a raw JSON string imported from a file.
+ * Accepts both the official `{ app, version, settings }` envelope and raw settings objects.
+ */
+export function parseSettingsImport(text) {
+  if (typeof text !== 'string' || !text.trim()) {
+    return { ok: false, error: 'El archivo está vacío' };
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { ok: false, error: 'El archivo no tiene un formato JSON válido' };
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { ok: false, error: 'El archivo no contiene un objeto JSON válido' };
+  }
+
+  const candidate =
+    parsed.settings && typeof parsed.settings === 'object' && !Array.isArray(parsed.settings)
+      ? parsed.settings
+      : parsed;
+
+  const hasRecognizableKey = RECOGNIZABLE_SETTING_KEYS.some((key) => key in candidate);
+  if (!hasRecognizableKey && parsed.app !== BACKUP_APP_ID) {
+    return { ok: false, error: 'El archivo no parece ser una configuración de la ruleta' };
+  }
+
+  const clean = sanitizeSettings(candidate);
+  if (clean.participants.length === 0) {
+    return { ok: false, error: 'La configuración importada no contiene participantes válidos' };
+  }
+
+  return { ok: true, settings: clean };
+}
+

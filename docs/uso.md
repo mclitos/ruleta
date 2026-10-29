@@ -90,6 +90,17 @@ acompaña, y si bajás el máximo por debajo del mínimo, baja el mínimo. Nunca
 un rango inválido. Poné mínimo igual a máximo si querés un tiempo fijo. Con
 `prefers-reduced-motion` el giro dura 1,4 s sin importar el rango.
 
+### Copia de respaldo (Exportar / Importar)
+
+Permite respaldar y migrar la configuración completa de la ruleta sin depender
+únicamente del `localStorage` del navegador actual:
+
+- **Exportar JSON**: genera un archivo `ruleta-config-YYYY-MM-DD.json` con
+  participantes, título, frase, logo (URL o inline), paleta y opciones de ambiente.
+- **Importar JSON**: abre un selector de archivos `.json`, valida y sanea la
+  estructura y carga los ajustes en el formulario. Al hacer clic en **Guardar**,
+  se aplican y persisten en el navegador.
+
 **Restablecer todo** devuelve la configuración a los defaults, incluida la lista de
 16 nombres de ejemplo.
 

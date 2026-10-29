@@ -3,16 +3,12 @@
 Pendientes acordados, ordenados por riesgo real. No son urgentes: la app funciona.
 
 Hecho: historial de ganadores persistido en `localStorage`
-(`ruleta-rifas:winners:v1`, tope de 500), tests de lógica pura con `node:test`
-(`npm test`) y repo publicado en https://github.com/mclitos/ruleta.
+(`ruleta-rifas:winners:v1`, tope de 500), export / import de configuración en JSON
+(`ruleta-config-YYYY-MM-DD.json`), tests de lógica pura con `node:test` (`npm test`),
+e2e con Playwright (`npm run test:e2e`) y repo publicado en
+https://github.com/mclitos/ruleta.
 
-## 1. Export / Import de configuración (JSON)
-
-Todo vive en el `localStorage` de un perfil de navegador. Al cambiar de máquina, de
-perfil o al limpiar datos se pierde logo (`data:` URL), paleta, participantes y
-ajustes. Un export/import JSON evita rehacerlo a mano.
-
-## 2. Ruleta en 3D (idea, para más adelante)
+## 1. Ruleta en 3D (idea, para más adelante)
 
 Reemplazo/alternativa visual del reel vertical por una rueda que gira en perspectiva.
 
